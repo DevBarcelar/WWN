@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWN - Word Web News</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>WWN</h1>
+            <span>Word Web News</span>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar no mundo...">
+            <button id="searchBtn">Buscar</button>
+        </div>
+
+        <button id="themeToggle">🌙 Modo Escuro</button>
+    </header>
+
+    <nav>
+        <ul id="nav-filtros">
+            <li><a href="#" data-categoria="general">Início</a></li>
+            <li><a href="#" data-categoria="technology">Tecnologia</a></li>
+            <li><a href="#" data-categoria="science">Ciência</a></li>
+            <li><a href="#" data-categoria="sports">Esportes</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <section class="news-list" id="newsList">
+            <p class="loading">Carregando notícias mundiais...</p>
+        </section>
+
+        <aside class="sidebar">
+            <div class="newsletter-box">
+                <h3>Newsletter WWN</h3>
+                <p>Receba alertas globais.</p>
+                <form id="newsletterForm">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" placeholder="Seu nome">
+                    
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" placeholder="email@wwn.com">
+                    
+                    <button type="submit">Cadastrar</button>
+                    <p id="formMessage" class="message"></p>
+                </form>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Word Web News (WWN). Projeto de Programação Front-End.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
