@@ -7,15 +7,20 @@ async function carregarNoticias(termo = '', categoria = 'general') {
     let url = '';
 
     if (termo !== '') {
-        url = `https://gnews.io/api/v4/search?q=${termo}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
-    } 
-
-    else {
-        url = `https://gnews.io/api/v4/top-headlines?category=${categoria}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
+        const apiUrl = `https://gnews.io/api/v4/search?q=${termo}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
+        url = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+    } else {
+        const apiUrl = `https://gnews.io/api/v4/top-headlines?category=${categoria}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
+        url = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
     }
 
     try {
         const resposta = await fetch(url);
+
+        if (!resposta.ok) {
+            throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+
         const dados = await resposta.json();
 
         if (dados.articles && dados.articles.length > 0) {
@@ -23,9 +28,10 @@ async function carregarNoticias(termo = '', categoria = 'general') {
         } else {
             newsList.innerHTML = '<p>Nenhuma notícia encontrada.</p>';
         }
+
     } catch (erro) {
         console.error('Erro na API:', erro);
-        newsList.innerHTML = '<p>Erro ao carregar notícias.</p>';
+        newsList.innerHTML = '<p>Erro ao carregar notícias. Tente novamente mais tarde.</p>';
     }
 }
 
