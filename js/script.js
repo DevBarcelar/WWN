@@ -1,37 +1,36 @@
-const API_KEY = '2d0b1a17a3cd081a2f9de705c922d78a';
+const API_KEY = 'pub_3cb07ed289994b4b9f994c3163ff0a23';
 const newsList = document.getElementById('newsList');
 
-async function carregarNoticias(termo = '', categoria = 'general') {
+async function carregarNoticias(termo = '', categoria = '') {
     newsList.innerHTML = '<p class="loading">Buscando notícias...</p>';
     
-    let url = '';
+    const catFiltro = (categoria === 'general' || categoria === '') ? 'top' : categoria;
+    
+    let url = `https://newsdata.io/api/1/news?apikey=${API_KEY}&language=pt&country=br`;
 
     if (termo !== '') {
-        const apiUrl = `https://gnews.io/api/v4/search?q=${termo}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
-        url = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+        url += `&q=${encodeURIComponent(termo)}`;
     } else {
-        const apiUrl = `https://gnews.io/api/v4/top-headlines?category=${categoria}&lang=pt&country=br&max=10&apikey=${API_KEY}`;
-        url = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
+        url += `&category=${catFiltro}`;
     }
 
     try {
         const resposta = await fetch(url);
-
-        if (!resposta.ok) {
-            throw new Error(`Erro HTTP: ${resposta.status}`);
-        }
-
         const dados = await resposta.json();
 
-        if (dados.articles && dados.articles.length > 0) {
-            renderizarNoticias(dados.articles);
+        if (dados.status === "error") {
+            throw new Error(dados.results.message || "Erro desconhecido na API");
+        }
+
+        if (dados.results && dados.results.length > 0) {
+            renderizarNoticias(dados.results);
         } else {
-            newsList.innerHTML = '<p>Nenhuma notícia encontrada.</p>';
+            newsList.innerHTML = '<p>Nenhuma notícia encontrada para esta busca.</p>';
         }
 
     } catch (erro) {
-        console.error('Erro na API:', erro);
-        newsList.innerHTML = '<p>Erro ao carregar notícias. Tente novamente mais tarde.</p>';
+        console.error('Erro na requisição:', erro);
+        newsList.innerHTML = `<p>Erro: ${erro.message}. Verifique se excedeu o limite diário da API.</p>`;
     }
 }
 
@@ -42,13 +41,15 @@ function renderizarNoticias(artigos) {
         const item = document.createElement('article');
         item.className = 'news-item';
         
-        const imgUrl = artigo.image || 'https://images.unsplash.com/photo-1504711432869-5d5932e23d01?w=800';
+        const imgUrl = artigo.image_url || 'https://images.unsplash.com/photo-1504711432869-5d5932e23d01?w=800';
         
         item.innerHTML = `
-            <img src="${imgUrl}" alt="Notícia">
+            <div class="news-image-container">
+                <img src="${imgUrl}" alt="Notícia" onerror="this.src='https://images.unsplash.com/photo-1504711432869-5d5932e23d01?w=800'">
+            </div>
             <h2>${artigo.title}</h2>
-            <p>${artigo.description || 'Leia a notícia completa.'}</p>
-            <a href="${artigo.url}" target="_blank" class="leia-mais-btn">Ler Notícia</a>
+            <p>${artigo.description || 'Clique no botão abaixo para ler os detalhes desta notícia no portal original.'}</p>
+            <a href="${artigo.link}" target="_blank" class="leia-mais-btn">Ler Notícia</a>
         `;
         
         newsList.appendChild(item);
@@ -72,19 +73,24 @@ document.getElementById('searchBtn').addEventListener('click', () => {
 });
 
 const themeBtn = document.getElementById('themeToggle');
-themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    themeBtn.textContent = document.body.classList.contains('dark-theme') 
-        ? '☀️ Modo Claro' 
-        : '🌙 Modo Escuro';
-});
+if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        themeBtn.textContent = document.body.classList.contains('dark-theme') 
+            ? '☀️ Modo Claro' 
+            : '🌙 Modo Escuro';
+    });
+}
 
-document.getElementById('newsletterForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    document.getElementById('formMessage').textContent = "Inscrição realizada com sucesso!";
-    this.reset();
-});
+const newsForm = document.getElementById('newsletterForm');
+if (newsForm) {
+    newsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('formMessage').textContent = "Inscrição realizada com sucesso!";
+        this.reset();
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    carregarNoticias('', 'general');
+    carregarNoticias();
 });
